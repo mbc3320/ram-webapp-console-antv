@@ -49,7 +49,7 @@ export const asyncRouterMap = [
         children: [
           {
             path: '/system/config',
-            name: 'config',
+            name: 'systemConfig',
             component: () => import('@/views/system/config/Index'),
             meta: {
               title: 'menu.system.config',
@@ -60,7 +60,7 @@ export const asyncRouterMap = [
           },
           {
             path: '/system/permission',
-            name: 'permission',
+            name: 'systemPermission',
             component: () => import('@/views/system/permission/Index'),
             meta: {
               title: 'menu.system.permission',
@@ -71,7 +71,7 @@ export const asyncRouterMap = [
           },
           {
             path: '/system/role',
-            name: 'role',
+            name: 'systemRole',
             component: () => import('@/views/system/role/Index'),
             meta: {
               title: 'menu.system.role',
@@ -82,13 +82,35 @@ export const asyncRouterMap = [
           },
           {
             path: '/system/user',
-            name: 'user',
+            name: 'systemUser',
             component: () => import('@/views/system/user/Index'),
             meta: {
               title: 'menu.system.user',
               keepAlive: true,
               icon: 'user',
               permission: ['menu_system_user']
+            }
+          },
+          {
+            path: '/system/ticket',
+            name: 'systemTicket',
+            component: () => import('@/views/system/ticket/Index'),
+            meta: {
+              title: 'menu.system.ticket',
+              keepAlive: true,
+              icon: 'schedule',
+              permission: ['menu_system_ticket']
+            }
+          },
+          {
+            path: '/system/settings',
+            name: 'systemSettings',
+            component: () => import('@/views/system/settings/Index'),
+            meta: {
+              title: 'menu.system.settings',
+              keepAlive: true,
+              icon: 'setting',
+              permission: ['menu_system_settings']
             }
           }
         ]

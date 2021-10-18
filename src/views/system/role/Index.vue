@@ -16,7 +16,7 @@
             </a-col>
             <a-col :md="8 || 24" :sm="24">
               <span class="table-page-search-submitButtons">
-                <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
+                <a-button type="primary" @click="loadTableData">查询</a-button>
                 <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
               </span>
             </a-col>
@@ -35,8 +35,8 @@
         :columns="columns"
         :data-source="data"
         :pagination="pagination"
+        :loading="loading"
         @change="tableChange"
-        showPagination="auto"
       >
 
         <span slot="roleDefault" slot-scope="text">
@@ -81,9 +81,9 @@
         </template>
 
         <a-tabs v-if="currentRecordId" :activeKey="grantDialogTabKey" @change="swithGrantedPanel">
-          <a-tab-pane key="0" tab="用户授权">
+          <!-- <a-tab-pane key="0" tab="用户授权">
             <p>用户授权</p>
-          </a-tab-pane>
+          </a-tab-pane> -->
           <a-tab-pane key="1" tab="接口授权">
             <PermissionGrant ref="apiGrantRef" :roleId="currentRecordId" :type="0" @listenToChildEvent="grantedDone" />
           </a-tab-pane>
@@ -172,8 +172,9 @@ export default {
       selectedRows: [],
       showAuthDialog: false,
       currentRecordId: null,
-      grantDialogTabKey: '0',
-      grantedDialogLoading: false
+      grantDialogTabKey: '1',
+      grantedDialogLoading: false,
+      loading: false
     }
   },
   filters: {
@@ -288,20 +289,23 @@ export default {
     onAuthDialogClose () {
       this.showAuthDialog = false
       this.currentRecordId = null
-      this.grantDialogTabKey = '0'
+      this.grantDialogTabKey = '1'
     },
     swithGrantedPanel (activeKey) {
       this.grantDialogTabKey = activeKey
     },
     grantedDone () {
-      console.log(this.grantedDialogLoading)
       this.grantedDialogLoading = false
     },
     loadTableData () {
+      this.loading = true
       const params = Object.assign(this.pagination, { params: this.queryParam })
       page(params).then(res => {
         this.data = res.data.records
         this.pagination.total = res.data.total
+        this.loading = false
+      }).catch(() => {
+        this.loading = false
       })
     },
     tableChange (pagination, filters, sorter) {

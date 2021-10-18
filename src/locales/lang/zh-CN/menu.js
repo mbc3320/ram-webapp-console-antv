@@ -40,5 +40,7 @@ export default {
     'menu.system.config': 'KV字典',
     'menu.system.permission': '权限',
     'menu.system.role': '角色',
-    'menu.system.user': '用户'
+    'menu.system.user': '用户',
+    'menu.system.ticket': '凭证',
+    'menu.system.settings': '全局设定'
 }

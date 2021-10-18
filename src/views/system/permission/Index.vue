@@ -227,10 +227,14 @@ export default {
       })
     },
     loadTableData () {
+      this.loading = true
       const params = Object.assign(this.pagination, { params: this.queryParam })
       page(params).then(res => {
         this.data = res.data.records
         this.pagination.total = res.data.total
+        this.loading = false
+      }).catch(() => {
+        this.loading = false
       })
     },
     resetSearchForm () {

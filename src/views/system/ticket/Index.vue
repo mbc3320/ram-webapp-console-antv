@@ -24,6 +24,16 @@
                 <a-input v-model="queryParam.nickName" placeholder=""/>
               </a-form-item>
             </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item label="Ticket">
+                <a-input v-model="queryParam.ticket" placeholder=""/>
+              </a-form-item>
+            </a-col>
+            <a-col :md="8" :sm="24">
+              <a-form-item label="IP">
+                <a-input v-model="queryParam.ipAddress" placeholder=""/>
+              </a-form-item>
+            </a-col>
             <a-col :md="8 || 24" :sm="24">
               <span class="table-page-search-submitButtons">
                 <a-button type="primary" @click="loadTableData">查询</a-button>
@@ -35,7 +45,6 @@
       </div>
 
       <div class="table-operator">
-        <a-button type="primary" icon="plus" @click="handleAdd">新建</a-button>
       </div>
 
       <a-table
@@ -49,49 +58,44 @@
         @change="tableChange"
       >
 
-        <span slot="accountState" slot-scope="accountState">
-          <a-tag v-if="accountState === 0" color="green">
-            正常
+        <span slot="loginType" slot-scope="loginType">
+          <a-tag v-if="loginType === 0" color="green">
+            帐号密码
           </a-tag>
-          <a-tag v-if="accountState === 1" color="orange">
-            锁定
+          <a-tag v-if="loginType === 1" color="orange">
+            手机验证码
           </a-tag>
-          <a-tag v-if="accountState === 2" color="red">
-            注销
+          <a-tag v-if="loginType === 2" color="red">
+            邮箱验证码
           </a-tag>
+          <a-tag v-if="loginType === 3" color="cyan">
+            微信公众号
+          </a-tag>
+          <a-tag v-if="loginType === 4" color="orange">
+            微信小程序
+          </a-tag>
+          <a-tag v-if="loginType === 5" color="pink">
+            其他
+          </a-tag>
+        </span>
+
+        <span slot="timeExpire" slot-scope="text, record">
+          <template>
+            <a-alert :message="record.timeExpire" :type="new Date(Date.parse(record.timeExpire)) > new Date() ? 'success' : 'error'" />
+          </template>
         </span>
 
         <span slot="action" slot-scope="text, record">
           <template>
-            <a @click="handleGranted(record)">授权</a>
-            <a-divider type="vertical" />
-            <a @click="handleEdit(record)">编辑</a>
-            <a-divider type="vertical" />
-            <a-popconfirm title="确定删除？" ok-text="是" cancel-text="否" @confirm="handleRemove(record)">
-              <a href="#">删除</a>
+            <a-popconfirm v-action:fun_system_ticket_kick placement="left" ok-text="是" cancel-text="否" @confirm="kickOut(record)">
+              <template slot="title">
+                <p>确定踢出此Ticket？成功后此用户需重新登录！请谨慎操作！</p>
+              </template>
+              <a v-if="new Date(Date.parse(record.timeExpire)) > new Date()">踢出</a>
             </a-popconfirm>
           </template>
         </span>
       </a-table>
-
-      <create-form
-        ref="createModal"
-        @listenToChildEvent="handleDone"
-        @cancel="handleCancel"
-        @ok="handleOk"
-      />
-
-      <a-modal
-        ref="grantedDialog"
-        title="角色授权"
-        :maskClosable="false"
-        v-model="showAuthDialog"
-        :footer="null"
-        width="60%"
-        @cancel="handleGrantClose"
-      >
-        <RoleGrantPanel v-if="currentRecord !== null" :userId="currentRecord.id" />
-      </a-modal>
 
     </a-card>
   </page-header-wrapper>
@@ -99,36 +103,61 @@
 
 <script>
 import moment from 'moment'
-import { page, get, remove } from '@/api/rbac/user'
-
-import CreateForm from './CreateForm'
-import RoleGrantPanel from './RoleGrantPanel.vue'
+import { page, kick } from '@/api/rbac/ticket'
 
 const columns = [
   {
     title: 'ID',
-    dataIndex: 'id'
+    dataIndex: 'id',
+    ellipsis: true
+  },
+  {
+    title: '用户ID',
+    dataIndex: 'userId',
+    ellipsis: true
+  },
+  {
+    title: 'Ticket',
+    dataIndex: 'ticket'
+  },
+  {
+    title: '登录方式',
+    dataIndex: 'loginType',
+    scopedSlots: { customRender: 'loginType' }
+  },
+  {
+    title: 'ip地址',
+    dataIndex: 'ipAddress'
+  },
+  {
+    title: '用户UA',
+    dataIndex: 'userAgent',
+    ellipsis: true
   },
   {
     title: '账号',
     dataIndex: 'account'
   },
   {
+    title: 'Email',
+    dataIndex: 'email'
+  },
+  {
     title: '昵称',
     dataIndex: 'nickName'
   },
   {
-    title: '账号状态',
-    dataIndex: 'accountState',
-    scopedSlots: { customRender: 'accountState' }
-  },
-  {
-    title: '邮箱',
-    dataIndex: 'email'
-  },
-  {
     title: '手机号',
     dataIndex: 'phoneNumber'
+  },
+  {
+    title: '上次刷新时间',
+    dataIndex: 'lastRefreshTime'
+  },
+  {
+    title: '预估失效时间',
+    dataIndex: 'timeExpire',
+    scopedSlots: { customRender: 'timeExpire' }
   },
   {
     title: '创建时间',
@@ -149,8 +178,6 @@ const columns = [
 export default {
   name: 'TableList',
   components: {
-    CreateForm,
-    RoleGrantPanel
   },
   data () {
     this.columns = columns
@@ -182,44 +209,6 @@ export default {
     this.loadTableData()
   },
   methods: {
-    handleAdd () {
-      const createModal = this.$refs.createModal
-      createModal.visible = true
-      this.resetCreateForm()
-    },
-    handleEdit (record) {
-      this.resetCreateForm()
-      const createModal = this.$refs.createModal
-      createModal.visible = true
-      createModal.loading = true
-      get({ id: record.id }).then(resp => {
-        this.$refs.createModal.form = { ...resp.data }
-        createModal.loading = false
-      })
-    },
-    handleOk () {
-      const createModal = this.$refs.createModal
-      createModal.loading = true
-      createModal.onSubmit()
-    },
-    handleDone () {
-      // 刷新表格
-      this.loadTableData()
-    },
-    handleCancel () {
-      const createModal = this.$refs.createModal
-      createModal.visible = false
-    },
-    handleRemove (record) {
-      remove({ id: record.id }).then(resp => {
-        // 刷新表格
-        this.loadTableData()
-        this.$message.info(resp.msg)
-      }).catch(e => {
-        this.$refs.table.refresh()
-        this.$message.error('删除失败')
-      })
-    },
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
@@ -228,20 +217,6 @@ export default {
       this.queryParam = {
         date: moment(new Date())
       }
-    },
-    resetCreateForm () {
-      this.$nextTick(() => {
-        const createModal = this.$refs.createModal
-        createModal.resetForm()
-      })
-    },
-    handleGranted (record) {
-      this.currentRecord = record
-      this.showAuthDialog = true
-    },
-    handleGrantClose () {
-      this.currentRecord = null
-      this.showAuthDialog = false
     },
     loadTableData () {
       this.loading = true
@@ -262,6 +237,12 @@ export default {
         this.pagination.current = pagination.current
       }
       this.loadTableData()
+    },
+    kickOut (record) {
+      kick({ id: record.id }).then(resp => {
+        this.$message.info('踢出成功')
+        this.loadTableData()
+      })
     }
   }
 }

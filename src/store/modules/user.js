@@ -59,10 +59,6 @@ const user = {
             commit('SET_ROLES', result.roleList)
             commit('SET_ACCESSES', result.accessList)
           }
-          // todo 模拟
-          commit('SET_ROLES', ['admin'])
-          commit('SET_ACCESSES', ['dashboard', 'form', 'table', 'profile', 'result', 'exception', 'user'])
-
           commit('SET_INFO', result)
           commit('SET_NAME', { name: result.nickName, welcome: welcome() })
           commit('SET_AVATAR', '')

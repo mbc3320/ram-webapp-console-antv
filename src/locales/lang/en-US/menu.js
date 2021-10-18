@@ -40,5 +40,7 @@ export default {
     'menu.system.config': 'KV Dict',
     'menu.system.permission': 'Permission',
     'menu.system.role': 'Role',
-    'menu.system.user': 'User'
+    'menu.system.user': 'User',
+    'menu.system.ticket': 'Ticket',
+    'menu.system.settings': 'Global Settings'
 }

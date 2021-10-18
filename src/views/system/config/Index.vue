@@ -11,7 +11,7 @@
             </a-col>
             <a-col :md="8 || 24" :sm="24">
               <span class="table-page-search-submitButtons">
-                <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
+                <a-button type="primary" @click="loadTableData">查询</a-button>
                 <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
               </span>
             </a-col>
@@ -20,29 +20,31 @@
       </div>
 
       <div class="table-operator">
-        <a-button type="primary" icon="plus" @click="handleAdd">新建</a-button>
+        <a-button type="primary" icon="plus" @click="handleAdd" v-action:fun_system_config_add>新建</a-button>
       </div>
 
-      <s-table
+      <a-table
         ref="table"
         size="default"
         rowKey="id"
         :columns="columns"
-        :data="loadData"
-        showPagination="true"
+        :data-source="data"
+        :pagination="pagination"
+        :loading="loading"
+        @change="tableChange"
       >
 
         <span slot="action" slot-scope="text, record">
           <template>
             <a-divider type="vertical" />
-            <a @click="handleEdit(record)">编辑</a>
+            <a @click="handleEdit(record)" v-action:fun_system_config_edit>编辑</a>
             <a-divider type="vertical" />
-            <a-popconfirm title="确定删除？" ok-text="是" cancel-text="否" @confirm="handleRemove(record)">
+            <a-popconfirm title="确定删除？" ok-text="是" cancel-text="否" @confirm="handleRemove(record)" v-action:fun_system_config_remove>
               <a href="#">删除</a>
             </a-popconfirm>
           </template>
         </span>
-      </s-table>
+      </a-table>
 
       <create-form
         ref="createModal"
@@ -59,7 +61,6 @@
 
 <script>
 import moment from 'moment'
-import { STable, Ellipsis } from '@/components'
 import { page, save, update, get, remove } from '@/api/rbac/config'
 
 import CreateForm from './CreateForm'
@@ -100,8 +101,6 @@ const columns = [
 export default {
   name: 'TableList',
   components: {
-    STable,
-    Ellipsis,
     CreateForm
   },
   data () {
@@ -112,24 +111,29 @@ export default {
       confirmLoading: false,
       mdl: null,
       // 查询参数
-      queryParam: {},
-      // 加载数据方法 必须为 Promise 对象
-      loadData: parameter => {
-        const requestParameters = Object.assign({}, parameter, { params: this.queryParam })
-        // console.log('loadData request parameters:', requestParameters)
-        return page(requestParameters)
-          .then(res => {
-            return res.data
-          })
+      queryParam: {
+        keyCode: null
+      },
+      data: [],
+      pagination: {
+        current: 1,
+        pageSize: 10,
+        showSizeChanger: true,
+        total: 0,
+        showTotal: total => `总共 ${total} 条数据`
       },
       selectedRowKeys: [],
-      selectedRows: []
+      selectedRows: [],
+      loading: false
     }
   },
   filters: {
 
   },
   computed: {
+  },
+  created () {
+    this.loadTableData()
   },
   methods: {
     handleAdd () {
@@ -157,7 +161,7 @@ export default {
               // 重置表单数据
               form.resetFields()
               // 刷新表格
-              this.$refs.table.refresh()
+              this.loadTableData()
 
               this.$message.info('修改成功')
             }).catch(e => {
@@ -171,7 +175,7 @@ export default {
               // 重置表单数据
               form.resetFields()
               // 刷新表格
-              this.$refs.table.refresh()
+              this.loadTableData()
 
               this.$message.info('新增成功')
             }).catch(e => {
@@ -192,10 +196,10 @@ export default {
     handleRemove (record) {
       remove({ id: record.id }).then(resp => {
         // 刷新表格
-        this.$refs.table.refresh()
+        this.loadTableData()
         this.$message.info(resp.msg)
       }).catch(e => {
-        this.$refs.table.refresh()
+        this.loadTableData()
         this.$message.error('删除失败')
       })
     },
@@ -207,6 +211,22 @@ export default {
       this.queryParam = {
         date: moment(new Date())
       }
+    },
+    loadTableData () {
+      const params = Object.assign(this.pagination, { params: this.queryParam })
+      page(params).then(res => {
+        this.data = res.data.records
+        this.pagination.total = res.data.total
+      })
+    },
+    tableChange (pagination, filters, sorter) {
+      if (pagination.pageSize !== this.pagination.pageSize) {
+        this.pagination.current = 1
+        this.pagination.pageSize = pagination.pageSize
+      } else {
+        this.pagination.current = pagination.current
+      }
+      this.loadTableData()
     }
   }
 }
