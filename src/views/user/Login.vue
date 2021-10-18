@@ -128,8 +128,8 @@ export default {
     return {
       customActiveKey: 'tab1',
       loginBtn: false,
-      // login type: 0 email, 1 username, 2 telephone
-      loginType: 0,
+      // login type: normalLogin, emailCodeLogin, smsCodeLogin...
+      loginType: 'normalLogin',
       isLoginError: false,
       requiredTwoStepCaptcha: false,
       stepCaptchaVisible: false,
@@ -137,8 +137,8 @@ export default {
       state: {
         time: 60,
         loginBtn: false,
-        // login type: 0 email, 1 username, 2 telephone
-        loginType: 0,
+        // login type: normalLogin, emailCodeLogin, smsCodeLogin...
+        loginType: 'normalLogin',
         smsSendBtn: false
       }
     }
@@ -160,9 +160,9 @@ export default {
       const { state } = this
       const regex = /^([a-zA-Z0-9_-])+@([a-zA-Z0-9_-])+((\.[a-zA-Z0-9_-]{2,3}){1,2})$/
       if (regex.test(value)) {
-        state.loginType = 0
+        state.loginType = 'normalLogin'
       } else {
-        state.loginType = 1
+        state.loginType = 'smsCodeLogin'
       }
       callback()
     },

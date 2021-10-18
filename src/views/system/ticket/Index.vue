@@ -59,22 +59,22 @@
       >
 
         <span slot="loginType" slot-scope="loginType">
-          <a-tag v-if="loginType === 0" color="green">
+          <a-tag v-if="loginType === 'normalLogin'" color="green">
             帐号密码
           </a-tag>
-          <a-tag v-if="loginType === 1" color="orange">
+          <a-tag v-else-if="loginType === 'smsCodeLogin'" color="orange">
             手机验证码
           </a-tag>
-          <a-tag v-if="loginType === 2" color="red">
+          <a-tag v-else-if="loginType === 'emailCodeLogin'" color="red">
             邮箱验证码
           </a-tag>
-          <a-tag v-if="loginType === 3" color="cyan">
+          <a-tag v-else-if="loginType === 'wxMpLogin'" color="cyan">
             微信公众号
           </a-tag>
-          <a-tag v-if="loginType === 4" color="orange">
+          <a-tag v-else-if="loginType === 'wxMaLogin'" color="orange">
             微信小程序
           </a-tag>
-          <a-tag v-if="loginType === 5" color="pink">
+          <a-tag v-else color="pink">
             其他
           </a-tag>
         </span>
