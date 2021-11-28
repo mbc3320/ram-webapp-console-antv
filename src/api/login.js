@@ -3,6 +3,7 @@ import request from '@/utils/request'
 const userApi = {
   Login: '/rbac/ticket/create',
   Logout: '/rbac/ticket/destroy',
+  captchaCreate: '/rbac/ticket/captchaCreate',
   ForgePassword: '/auth/forge-password',
   Register: '/auth/register',
   twoStepCode: '/auth/2step-code',
@@ -74,6 +75,14 @@ export function logout () {
 export function get2step (parameter) {
   return request({
     url: userApi.twoStepCode,
+    method: 'post',
+    data: parameter
+  })
+}
+
+export function captchaCreate (parameter) {
+  return request({
+    url: userApi.captchaCreate,
     method: 'post',
     data: parameter
   })

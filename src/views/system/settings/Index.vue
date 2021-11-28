@@ -3,7 +3,7 @@
     <a-card title="系统全局设定" :bordered="false" style="width: 100%;">
       <a slot="extra" href="#" @click="saveOrUpdateConfig">保存设置</a>
       <a-descriptions title="登录图形校验码">
-        <a-descriptions-item label="是否启用">
+        <a-descriptions-item label="">
           <a-radio-group v-model="config.consoleCaptcha">
             <a-radio-button :value="true">
               启用
@@ -11,19 +11,118 @@
             <a-radio-button :value="false">
               禁用
             </a-radio-button>
-          </a-radio-group>
-        </a-descriptions-item>
-        <a-descriptions-item v-if="config.consoleCaptcha" label="校验码类型">
-          <a-radio-group v-model="config.captchaType">
-            <a-radio-button :value="0">
-              字母表
-            </a-radio-button>
-            <a-radio-button :value="1">
-              算术式
-            </a-radio-button>
-            <a-radio-button :value="2">
-              随机中文
-            </a-radio-button>
+            <br><br>
+            <a-form-model
+              v-if="config.consoleCaptcha"
+              ref="captchaMetaForm"
+              layout="inline"
+              :model="captchaMetaForm"
+              v-bind="formItemLayoutWithOutLabel"
+            >
+              <a-row
+                :gutter="24"
+                v-for="(meta, index) in captchaMetaForm.metaList"
+                :key="'captchaType_' + index"
+              >
+                <a-col :span="24">
+
+                  <span>{{ meta.captchaMetaName === null ? '验证码类型名称' : meta.captchaMetaName }}</span>
+                  <a-divider type="vertical" />
+                  <br>
+                  <a-form-model-item
+                    label="启用"
+                    :prop="'metaList.' + index + '.enable'"
+                  >
+                    <a-checkbox v-model="meta.enable" @change="captchaTypeEnableEvent(meta)" />
+                  </a-form-model-item>
+                  <a-form-model-item
+                    label="服务名"
+                    :prop="'metaList.' + index + '.captchaServiceName'"
+                    :rules="{
+                      required: true,
+                      message: '验证码服务名必填且只能为字母组合(首字母小写)',
+                      pattern: '^[a-z][a-zA-Z]*$',
+                      trigger: 'blur',
+                    }"
+                  >
+                    <a-input
+                      v-model="meta.captchaServiceName"
+                      placeholder="请输入验证码服务名称"
+                    />
+                  </a-form-model-item>
+
+                  <a-form-model-item
+                    label="名称"
+                    :prop="'metaList.' + index + '.captchaMetaName'"
+                    :rules="{
+                      required: true,
+                      message: '验证码类型名称必填',
+                      trigger: 'blur',
+                    }"
+                  >
+                    <a-input
+                      v-model="meta.captchaMetaName"
+                      placeholder="请输入验证码类型名称"
+                    />
+                  </a-form-model-item>
+
+                  <a-form-model-item
+                    label="宽度"
+                    :prop="'metaList.' + index + '.width'"
+                    :rules="{
+                      required: true,
+                      message: '验证码宽度必填',
+                      trigger: 'blur',
+                    }"
+                  >
+                    <a-input-number
+                      v-model="meta.width"
+                      :min="20"
+                      placeholder="请输入验证码宽度"
+                    />
+                  </a-form-model-item>
+
+                  <a-form-model-item
+                    label="高度"
+                    :prop="'metaList.' + index + '.height'"
+                    :rules="{
+                      required: true,
+                      message: '验证码高度必填',
+                      trigger: 'blur',
+                    }"
+                  >
+                    <a-input-number
+                      v-model="meta.height"
+                      :min="10"
+                      placeholder="请输入验证码高度"
+                    />
+                  </a-form-model-item>
+
+                  <a-form-model-item
+                    label="验证码配置"
+                    :prop="'metaList.' + index + '.extJson'"
+                  >
+                    <a-input
+                      v-model="meta.extJson"
+                      placeholder="请输入其他配置信息"
+                    >
+                      <a-icon
+                        slot="suffix"
+                        v-if="index !== 0"
+                        class="dynamic-delete-button"
+                        type="minus-circle-o"
+                        @click="removeCaptchaType(meta)"
+                      />
+                    </a-input>
+                  </a-form-model-item>
+                </a-col>
+              </a-row>
+              <a-form-model-item v-bind="formItemLayoutWithOutLabel">
+                <a-button type="dashed" @click="addCaptchaType">
+                  <a-icon type="plus" /> 添加验证码方式
+                </a-button>
+              </a-form-model-item>
+            </a-form-model>
           </a-radio-group>
         </a-descriptions-item>
       </a-descriptions>
@@ -72,12 +171,13 @@
             <a-row
               :gutter="24"
               v-for="(meta, index) in loginTypeForm.typeList"
-              :key="meta.loginType"
+              :key="'loginType_' + index"
             >
               <a-col :span="24">
 
                 <span>{{ meta.typeName === null ? '登录方式' : meta.typeName }}</span>
                 <a-divider type="vertical" />
+                <br>
                 <a-form-model-item
                   label="启用"
                   :prop="'typeList.' + index + '.enable'"
@@ -202,13 +302,31 @@ export default {
       id: null,
       config: {
         consoleCaptcha: false,
-        captchaType: null,
+        captchaMetaList: [],
         loginServiceMetaList: [],
         ticketTimeout: 120,
         passwordErrorExpireTime: 5
       },
       loginTypeForm: {
         typeList: []
+      },
+      captchaMetaForm: {
+        metaList: []
+      }
+    }
+  },
+  watch: {
+    'config.consoleCaptcha' (val) {
+      if (val) {
+        let hasEnable = false
+        this.captchaMetaForm.metaList.forEach(meta => {
+          if (meta.enable) {
+            hasEnable = true
+          }
+        })
+        if (!hasEnable) {
+          this.captchaMetaForm.metaList[0].enable = true
+        }
       }
     }
   },
@@ -220,6 +338,7 @@ export default {
       getGlobalConfig().then(resp => {
         this.id = resp.data.id
         this.config = JSON.parse(resp.data.keyValue)
+        this.captchaMetaForm.metaList = this.config.captchaMetaList
         this.loginTypeForm.typeList = this.config.loginServiceMetaList
       })
     },
@@ -230,6 +349,7 @@ export default {
             title: '确定对系统全局设置进行修改吗?',
             content: '一旦确定，错误的设定有可能使系统无法正常使用，请谨慎操作！！！',
             onOk: () => {
+              this.config.captchaMetaList = this.captchaMetaForm.metaList
               this.config.loginServiceMetaList = this.loginTypeForm.typeList
                 const params = {
                     id: this.id,
@@ -267,6 +387,35 @@ export default {
         enable: false,
         loginFactoryServiceName: null
       })
+    },
+    removeCaptchaType (item) {
+      const index = this.captchaMetaForm.metaList.indexOf(item)
+      if (index !== -1) {
+        this.captchaMetaForm.metaList.splice(index, 1)
+      }
+    },
+    addCaptchaType () {
+      this.captchaMetaForm.metaList.push({
+        enable: false,
+        captchaServiceName: null,
+        captchaMetaName: null,
+        width: 100,
+        height: 36,
+        extJson: null
+      })
+    },
+    captchaTypeEnableEvent (meta) {
+      if (!meta.enable) {
+        this.$message.warning('必须保留一种方式或者通过禁用关闭功能')
+        meta.enable = true
+      } else {
+        this.captchaMetaForm.metaList.forEach(otherMeta => {
+          if (meta.captchaServiceName !== otherMeta.name) {
+            otherMeta.enable = false
+            meta.enable = true
+          }
+        })
+      }
     }
   }
 }

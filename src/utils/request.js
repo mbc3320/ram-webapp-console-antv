@@ -3,7 +3,7 @@ import store from '@/store'
 import storage from 'store'
 import notification from 'ant-design-vue/es/notification'
 import { VueAxios } from './axios'
-import { ACCESS_TOKEN } from '@/store/mutation-types'
+import { ACCESS_TOKEN, APP_LANGUAGE } from '@/store/mutation-types'
 
 // 创建 axios 实例
 const request = axios.create({
@@ -44,6 +44,8 @@ const errorHandler = (error) => {
 // request interceptor
 request.interceptors.request.use(config => {
   const token = storage.get(ACCESS_TOKEN)
+  // 从 localStorage 获取 language
+  const lang = storage.get(APP_LANGUAGE)
   // 如果 token 存在
   // 让每个请求携带自定义 token 请根据实际情况自行修改
   if (token) {
@@ -52,6 +54,17 @@ request.interceptors.request.use(config => {
   // set default content-type as application/json
   if (!config.headers['Content-Type']) {
     config.headers['Content-Type'] = 'application/json'
+  }
+
+  if (lang) {
+    switch (lang) {
+      case 'zh-CN':
+        config.headers['Accept-Language'] = 'zh-CN,zh;q=0.5'
+        break
+      case 'en-US':
+        config.headers['Accept-Language'] = 'en-US,en;q=0.5'
+        break
+    }
   }
 
   // transform form data as json string
@@ -74,8 +87,8 @@ request.interceptors.response.use((response) => {
     // if the custom code is not 0, it is judged as an error.
     if (res.code !== 0) {
       let msg
-      if (res.code === 9001) {
-        msg = res.msg + ':' + res.data
+      if (res.code === 9001 || res.code === 10102) {
+        msg = res.msg + ': ' + res.data
       } else {
         msg = res.msg
       }

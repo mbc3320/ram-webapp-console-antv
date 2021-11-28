@@ -40,8 +40,23 @@
               <a-icon slot="prefix" type="lock" :style="{ color: 'rgba(0,0,0,.25)' }"/>
             </a-input-password>
           </a-form-item>
+          <a-form-item v-if="captchaInfo.required">
+            <a-input
+              size="large"
+              :placeholder="$t('user.login.imgValidCodeText.placeholder')"
+              v-decorator="[
+                'imgValidCodeText',
+                {rules: [{ required: true, message: $t('user.imgValidCodeText.required') }], validateTrigger: 'blur'}
+              ]"
+            >
+              <a-icon slot="prefix" type="scan" :style="{ color: 'rgba(0,0,0,.25)' }"/>
+              <div slot="addonAfter" @click="createOrRefreshCaptcha">
+                <img :src="captchaInfo.base64Data">
+              </div>
+            </a-input>
+          </a-form-item>
         </a-tab-pane>
-        <a-tab-pane key="tab2" :tab="$t('user.login.tab-login-mobile')">
+        <a-tab-pane v-if="false" key="tab2" :tab="$t('user.login.tab-login-mobile')">
           <a-form-item>
             <a-input size="large" type="text" :placeholder="$t('user.login.mobile.placeholder')" v-decorator="['mobile', {rules: [{ required: true, pattern: /^1[34578]\d{9}$/, message: $t('user.login.mobile.placeholder') }], validateTrigger: 'change'}]">
               <a-icon slot="prefix" type="mobile" :style="{ color: 'rgba(0,0,0,.25)' }"/>
@@ -118,7 +133,7 @@ import md5 from 'md5'
 import TwoStepCaptcha from '@/components/tools/TwoStepCaptcha'
 import { mapActions } from 'vuex'
 import { timeFix } from '@/utils/util'
-import { getSmsCaptcha, get2step } from '@/api/login'
+import { getSmsCaptcha, get2step, captchaCreate } from '@/api/login'
 
 export default {
   components: {
@@ -140,6 +155,11 @@ export default {
         // login type: normalLogin, emailCodeLogin, smsCodeLogin...
         loginType: 'normalLogin',
         smsSendBtn: false
+      },
+      captchaInfo: {
+        required: false,
+        id: null,
+        base64Data: null
       }
     }
   },
@@ -152,6 +172,7 @@ export default {
         this.requiredTwoStepCaptcha = false
       })
     // this.requiredTwoStepCaptcha = true
+    this.createOrRefreshCaptcha()
   },
   methods: {
     ...mapActions(['Login', 'Logout']),
@@ -181,17 +202,26 @@ export default {
 
       state.loginBtn = true
 
-      const validateFieldsKey = customActiveKey === 'tab1' ? ['username', 'password'] : ['mobile', 'captcha']
+      const validateFieldsKey = customActiveKey === 'tab1' ? ['username', 'password', 'imgValidCodeText'] : ['mobile', 'captcha']
 
       validateFields(validateFieldsKey, { force: true }, (err, values) => {
         if (!err) {
           const loginParams = { ...values }
           delete loginParams.username
+          console.log(loginParams)
           loginParams.loginType = this.loginType
           loginParams.account = values.username
           loginParams.accountAuth = md5(values.password)
+          if (this.captchaInfo.required) {
+            loginParams.imgValidCodeId = this.captchaInfo.id
+            loginParams.imgValidCodeText = values.imgValidCodeText
+          }
+          // console.log(loginParams)
           Login(loginParams)
             .then((res) => this.loginSuccess(res))
+            .catch(() => {
+              this.createOrRefreshCaptcha()
+            })
             .finally(() => {
               state.loginBtn = false
             })
@@ -273,6 +303,11 @@ export default {
         message: '错误',
         description: ((err.response || {}).data || {}).message || '请求出现错误，请稍后再试',
         duration: 4
+      })
+    },
+    createOrRefreshCaptcha () {
+      captchaCreate().then(resp => {
+        this.captchaInfo = resp.data
       })
     }
   }

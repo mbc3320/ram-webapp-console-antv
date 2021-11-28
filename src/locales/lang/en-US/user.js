@@ -1,10 +1,9 @@
 export default {
   'user.login.userName': 'userName',
   'user.login.password': 'password',
-  'user.login.username.placeholder': 'Account: admin',
-  'user.login.password.placeholder': 'password: admin or ant.design',
-  'user.login.message-invalid-credentials':
-    'Invalid username or password（admin/ant.design）',
+  'user.login.username.placeholder': 'Please input your username',
+  'user.login.password.placeholder': 'Please input your password',
+  'user.login.message-invalid-credentials': 'Invalid username or password',
   'user.login.message-invalid-verification-code': 'Invalid verification code',
   'user.login.tab-login-credentials': 'Credentials',
   'user.login.tab-login-mobile': 'Mobile number',
@@ -15,6 +14,7 @@ export default {
   'user.login.sign-in-with': 'Sign in with',
   'user.login.signup': 'Sign up',
   'user.login.login': 'Login',
+  'user.login.imgValidCodeText.placeholder': 'Please input the captcha text',
   'user.register.register': 'Register',
   'user.register.email.placeholder': 'Email',
   'user.register.password.placeholder': 'Password ',
@@ -41,5 +41,6 @@ export default {
   'user.confirm-password.required': 'Please confirm your password!',
   'user.phone-number.required': 'Please enter your phone number!',
   'user.phone-number.wrong-format': 'Please enter a valid phone number',
-  'user.verification-code.required': 'Please enter the verification code!'
+  'user.verification-code.required': 'Please enter the verification code!',
+  'user.imgValidCodeText.required': 'Captcha text is required!'
 }

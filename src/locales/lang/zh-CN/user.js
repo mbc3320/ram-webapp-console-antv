@@ -1,9 +1,9 @@
 export default {
   'user.login.userName': '用户名',
   'user.login.password': '密码',
-  'user.login.username.placeholder': '账户: admin',
-  'user.login.password.placeholder': '密码: admin or ant.design',
-  'user.login.message-invalid-credentials': '账户或密码错误（admin/ant.design）',
+  'user.login.username.placeholder': '请输入用户名',
+  'user.login.password.placeholder': '请输入密码',
+  'user.login.message-invalid-credentials': '账户或密码错误',
   'user.login.message-invalid-verification-code': '验证码错误',
   'user.login.tab-login-credentials': '账户密码登录',
   'user.login.tab-login-mobile': '手机号登录',
@@ -14,6 +14,7 @@ export default {
   'user.login.sign-in-with': '其他登录方式',
   'user.login.signup': '注册账户',
   'user.login.login': '登录',
+  'user.login.imgValidCodeText.placeholder': '请输入验证码',
   'user.register.register': '注册',
   'user.register.email.placeholder': '邮箱',
   'user.register.password.placeholder': '请至少输入 6 个字符。请不要使用容易被猜到的密码。',
@@ -39,5 +40,6 @@ export default {
   'user.confirm-password.required': '请确认密码！',
   'user.phone-number.required': '请输入正确的手机号',
   'user.phone-number.wrong-format': '手机号格式错误！',
-  'user.verification-code.required': '请输入验证码！'
+  'user.verification-code.required': '请输入验证码！',
+  'user.imgValidCodeText.required': '验证码必填'
 }
