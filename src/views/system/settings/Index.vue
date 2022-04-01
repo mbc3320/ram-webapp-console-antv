@@ -1,15 +1,15 @@
 <template>
   <div style="background:#ECECEC; padding:30px">
-    <a-card title="系统全局设定" :bordered="false" style="width: 100%;">
-      <a slot="extra" href="#" @click="saveOrUpdateConfig">保存设置</a>
-      <a-descriptions title="登录图形校验码">
+    <a-card :title="$t('system.setting.global')" :bordered="false" style="width: 100%;">
+      <a slot="extra" href="#" @click="saveOrUpdateConfig">{{ $t('global.save') }}</a>
+      <a-descriptions :title="$t('system.setting.loginCaptcha')">
         <a-descriptions-item label="">
           <a-radio-group v-model="config.consoleCaptcha">
             <a-radio-button :value="true">
-              启用
+              {{ $t('global.enable') }}
             </a-radio-button>
             <a-radio-button :value="false">
-              禁用
+              {{ $t('global.disable') }}
             </a-radio-button>
             <br><br>
             <a-form-model
@@ -26,85 +26,85 @@
               >
                 <a-col :span="24">
 
-                  <span>{{ meta.captchaMetaName === null ? '验证码类型名称' : meta.captchaMetaName }}</span>
+                  <span>{{ meta.captchaMetaName === null ? $t('system.setting.loginCaptcha.name') : meta.captchaMetaName }}</span>
                   <a-divider type="vertical" />
                   <br>
                   <a-form-model-item
-                    label="启用"
+                    :label="$t('global.enable')"
                     :prop="'metaList.' + index + '.enable'"
                   >
                     <a-checkbox v-model="meta.enable" @change="captchaTypeEnableEvent(meta)" />
                   </a-form-model-item>
                   <a-form-model-item
-                    label="服务名"
+                    :label="$t('global.service.name')"
                     :prop="'metaList.' + index + '.captchaServiceName'"
                     :rules="{
                       required: true,
-                      message: '验证码服务名必填且只能为字母组合(首字母小写)',
+                      message: $t('system.setting.loginCaptcha.serviceName.required'),
                       pattern: '^[a-z][a-zA-Z]*$',
                       trigger: 'blur',
                     }"
                   >
                     <a-input
                       v-model="meta.captchaServiceName"
-                      placeholder="请输入验证码服务名称"
+                      :placeholder="$t('system.setting.loginCaptcha.serviceName.placeholder')"
                     />
                   </a-form-model-item>
 
                   <a-form-model-item
-                    label="名称"
+                    :label="$t('global.name')"
                     :prop="'metaList.' + index + '.captchaMetaName'"
                     :rules="{
                       required: true,
-                      message: '验证码类型名称必填',
+                      message: $t('system.setting.loginCaptcha.name.required'),
                       trigger: 'blur',
                     }"
                   >
                     <a-input
                       v-model="meta.captchaMetaName"
-                      placeholder="请输入验证码类型名称"
+                      :placeholder="$t('system.setting.loginCaptcha.name.placeholder')"
                     />
                   </a-form-model-item>
 
                   <a-form-model-item
-                    label="宽度"
+                    :label="$t('global.height')"
                     :prop="'metaList.' + index + '.width'"
                     :rules="{
                       required: true,
-                      message: '验证码宽度必填',
+                      message: $t('system.setting.loginCaptcha.width.required'),
                       trigger: 'blur',
                     }"
                   >
                     <a-input-number
                       v-model="meta.width"
                       :min="20"
-                      placeholder="请输入验证码宽度"
+                      placeholder="100"
                     />
                   </a-form-model-item>
 
                   <a-form-model-item
-                    label="高度"
+                    :label="$t('global.width')"
                     :prop="'metaList.' + index + '.height'"
                     :rules="{
                       required: true,
-                      message: '验证码高度必填',
+                      message: $t('system.setting.loginCaptcha.height.required'),
                       trigger: 'blur',
                     }"
                   >
                     <a-input-number
                       v-model="meta.height"
                       :min="10"
-                      placeholder="请输入验证码高度"
+                      placeholder="36"
                     />
                   </a-form-model-item>
 
                   <a-form-model-item
-                    label="验证码配置"
+                    :label="$t('system.setting.loginCaptcha.config')"
                     :prop="'metaList.' + index + '.extJson'"
                   >
                     <a-input
                       v-model="meta.extJson"
-                      placeholder="请输入其他配置信息"
+                      :placeholder="$t('system.setting.loginCaptcha.extJson.placeholder')"
                     >
                       <a-icon
                         slot="suffix"
@@ -119,48 +119,48 @@
               </a-row>
               <a-form-model-item v-bind="formItemLayoutWithOutLabel">
                 <a-button type="dashed" @click="addCaptchaType">
-                  <a-icon type="plus" /> 添加验证码方式
+                  <a-icon type="plus" /> {{ $t('system.setting.addAnother') }}
                 </a-button>
               </a-form-model-item>
             </a-form-model>
           </a-radio-group>
         </a-descriptions-item>
       </a-descriptions>
-      <a-descriptions title="期限类设定">
-        <a-descriptions-item label="Ticket有效期">
+      <a-descriptions :title="$t('system.setting.time')">
+        <a-descriptions-item :label="$t('system.setting.ticketExpire')">
           <a-radio-group v-model="config.ticketTimeout">
             <a-radio-button :value="120">
-              2小时
+              2 {{ $t('global.unit.hours') }}
             </a-radio-button>
             <a-radio-button :value="300">
-              5小时
+              5 {{ $t('global.unit.hours') }}
             </a-radio-button>
             <a-radio-button :value="1440">
-              1天
+              1 {{ $t('global.unit.days') }}
             </a-radio-button>
             <a-radio-button :value="10080">
-              7天
+              7 {{ $t('global.unit.days') }}
             </a-radio-button>
             <a-radio-button :value="43200">
-              30天
+              30 {{ $t('global.unit.days') }}
             </a-radio-button>
           </a-radio-group>
         </a-descriptions-item>
-        <a-descriptions-item label="密码错误事件有效期">
+        <a-descriptions-item :label="$t('system.setting.passwordErrEventExpire')">
           <a-radio-group v-model="config.passwordErrorExpireTime">
             <a-radio-button :value="1">
-              1小时
+              1 {{ $t('global.unit.hours') }}
             </a-radio-button>
             <a-radio-button :value="5">
-              5小时
+              5 {{ $t('global.unit.hours') }}
             </a-radio-button>
             <a-radio-button :value="24">
-              24小时
+              24 {{ $t('global.unit.hours') }}
             </a-radio-button>
           </a-radio-group>
         </a-descriptions-item>
       </a-descriptions>
-      <a-descriptions title="登录方式设定" :column="1">
+      <a-descriptions :title="$t('system.setting.loginType.setting')" :column="1">
         <a-descriptions-item label="">
           <a-form-model
             ref="loginTypeForm"
@@ -175,59 +175,59 @@
             >
               <a-col :span="24">
 
-                <span>{{ meta.typeName === null ? '登录方式' : meta.typeName }}</span>
+                <span>{{ meta.typeName === null ? $t('system.setting.loginType') : meta.typeName }}</span>
                 <a-divider type="vertical" />
                 <br>
                 <a-form-model-item
-                  label="启用"
+                  :label="$t('global.enable')"
                   :prop="'typeList.' + index + '.enable'"
                 >
                   <a-checkbox v-model="meta.enable" />
                 </a-form-model-item>
                 <a-form-model-item
-                  label="编码"
+                  :label="$t('system.setting.loginType.code')"
                   :prop="'typeList.' + index + '.loginType'"
                   :rules="{
                     required: true,
-                    message: '登录方式编码必填且只能为字母组合(首字母小写)',
+                    message: $t('system.setting.loginType.code.required'),
                     pattern: '^[a-z][a-zA-Z]*$',
                     trigger: 'blur',
                   }"
                 >
                   <a-input
                     v-model="meta.loginType"
-                    placeholder="请输入登录方式编码"
+                    :placeholder="$t('system.setting.loginType.code.placeholder')"
                   />
                 </a-form-model-item>
 
                 <a-form-model-item
-                  label="名称"
+                  :label="$t('global.name')"
                   :prop="'typeList.' + index + '.typeName'"
                   :rules="{
                     required: true,
-                    message: '登录方式名称必填',
+                    message: $t('system.setting.loginType.name.required'),
                     trigger: 'blur',
                   }"
                 >
                   <a-input
                     v-model="meta.typeName"
-                    placeholder="请输入登录方式名称"
+                    :placeholder="$t('system.setting.loginType.name.placeholder')"
                   />
                 </a-form-model-item>
 
                 <a-form-model-item
-                  label="工厂服务名"
+                  :label="$t('system.setting.loginType.factoryName')"
                   :prop="'typeList.' + index + '.loginFactoryServiceName'"
                   :rules="{
                     required: true,
-                    message: '登录方式工厂服务名必填且只能为字母组合(首字母小写)',
+                    message: $t('system.setting.loginType.factoryName.required'),
                     pattern: '^[a-z][a-zA-Z]*$',
                     trigger: 'blur',
                   }"
                 >
                   <a-input
                     v-model="meta.loginFactoryServiceName"
-                    placeholder="请输入登录方式工厂服务名"
+                    :placeholder="$t('system.setting.loginType.factoryName.placeholder')"
                   >
                     <a-icon
                       slot="suffix"
@@ -242,7 +242,7 @@
             </a-row>
             <a-form-model-item v-bind="formItemLayoutWithOutLabel">
               <a-button type="dashed" @click="addLoginType">
-                <a-icon type="plus" /> 添加登录方式
+                <a-icon type="plus" /> {{ $t('system.setting.addAnother') }}
               </a-button>
             </a-form-model-item>
           </a-form-model>
@@ -254,32 +254,6 @@
 <script>
 import { getGlobalConfig, saveOrUpdateGlobalConfig } from '@/api/rbac/config'
 
-// const loginServiceMetaList = [{
-//         loginType: 'normalLogin',
-//         typeName: '账号密码',
-//         enable: true,
-//         loginFactoryServiceName: 'normalLoginFactory'
-//       }, {
-//         loginType: 'smsCodeLogin',
-//         typeName: '短信验证码',
-//         enable: false,
-//         loginFactoryServiceName: 'smsCodeLoginFactory'
-//       }, {
-//         loginType: 'emailCodeLogin',
-//         typeName: '邮箱验证码',
-//         enable: false,
-//         loginFactoryServiceName: 'emailCodeLoginFactory'
-//       }, {
-//         loginType: 'wxMpLogin',
-//         typeName: '微信公众号',
-//         enable: false,
-//         loginFactoryServiceName: 'wxMpLoginFactory'
-//       }, {
-//         loginType: 'wxMaLogin',
-//         typeName: '微信小程序',
-//         enable: false,
-//         loginFactoryServiceName: 'wxMaLoginFactory'
-//       }]
 export default {
   data () {
     return {
@@ -346,8 +320,8 @@ export default {
       this.$refs['loginTypeForm'].validate(valid => {
         if (valid) {
           this.$confirm({
-            title: '确定对系统全局设置进行修改吗?',
-            content: '一旦确定，错误的设定有可能使系统无法正常使用，请谨慎操作！！！',
+            title: this.$t('system.setting.saveOrUpdateDialogTitle'),
+            content: this.$t('system.setting.saveOrUpdateDialogContent'),
             onOk: () => {
               this.config.captchaMetaList = this.captchaMetaForm.metaList
               this.config.loginServiceMetaList = this.loginTypeForm.typeList
@@ -357,21 +331,15 @@ export default {
                 }
               saveOrUpdateGlobalConfig(params).then(resp => {
                 this.$notification.info({
-                  message: '系统设置保存成功',
-                  description: '原Ticket有效期不变、下次ticket刷新将会按新设置延期'
+                  message: this.$t('global.success'),
+                  description: this.$t('system.setting.saveOrUpdate.result')
                 })
               })
             }
           })
         } else {
-          this.$message.error('请填写表单必填内容，再保存')
+          this.$message.error(this.$t('system.setting.saveOrUpdate.validErr'))
         }
-      })
-    },
-    showTip () {
-      this.$notification.info({
-        message: '提示',
-        description: '当前仅实现了账号密码的登录方式，其他登录方式将会在后续支持'
       })
     },
     removeLoginType (item) {
@@ -406,7 +374,7 @@ export default {
     },
     captchaTypeEnableEvent (meta) {
       if (!meta.enable) {
-        this.$message.warning('必须保留一种方式或者通过禁用关闭功能')
+        this.$message.warning(this.$t('system.setting.captchaType.warning'))
         meta.enable = true
       } else {
         this.captchaMetaForm.metaList.forEach(otherMeta => {

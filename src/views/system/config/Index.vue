@@ -5,14 +5,14 @@
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-form-item label="字典编码">
+              <a-form-item :label="$t('system.config.keyCode')">
                 <a-input v-model="queryParam.keyCode" placeholder=""/>
               </a-form-item>
             </a-col>
             <a-col :md="8 || 24" :sm="24">
               <span class="table-page-search-submitButtons">
-                <a-button type="primary" @click="loadTableData">查询</a-button>
-                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
+                <a-button type="primary" @click="loadTableData">{{ $t('global.query') }}</a-button>
+                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">{{ $t('global.reset') }}</a-button>
               </span>
             </a-col>
           </a-row>
@@ -20,30 +20,36 @@
       </div>
 
       <div class="table-operator">
-        <a-button type="primary" icon="plus" @click="handleAdd" v-action:fun_system_config_add>新建</a-button>
+        <a-button type="primary" icon="plus" @click="handleAdd" v-action:fun_system_config_add>{{ $t('global.add') }}</a-button>
       </div>
 
       <a-table
         ref="table"
         size="default"
         rowKey="id"
-        :columns="columns"
         :data-source="data"
         :pagination="pagination"
         :loading="loading"
         @change="tableChange"
       >
 
-        <span slot="action" slot-scope="text, record">
-          <template>
+        <a-table-column key="id" title="ID" data-index="id" />
+        <a-table-column key="keyCode" :title="$t('system.config.keyCode')" data-index="keyCode" />
+        <a-table-column key="keyValue" :title="$t('system.config.keyValue')" data-index="keyValue" />
+        <a-table-column key="keyDesc" :title="$t('system.config.keyDesc')" data-index="keyDesc" />
+        <a-table-column key="createTime" :title="$t('global.createTime')" data-index="createTime" />
+        <a-table-column key="updateTime" :title="$t('global.updateTime')" data-index="updateTime" />
+        <a-table-column key="action" :title="$t('global.action')">
+          <template slot-scope="text, record">
             <a-divider type="vertical" />
-            <a @click="handleEdit(record)" v-action:fun_system_config_edit>编辑</a>
+            <a @click="handleEdit(record)" v-action:fun_system_config_edit>{{ $t('global.edit') }}</a>
             <a-divider type="vertical" />
-            <a-popconfirm title="确定删除？" ok-text="是" cancel-text="否" @confirm="handleRemove(record)" v-action:fun_system_config_remove>
-              <a href="#">删除</a>
+            <a-popconfirm :title="$t('global.areYouSure')" :ok-text="$t('global.yes')" :cancel-text="$t('global.no')" @confirm="handleRemove(record)" v-action:fun_system_config_remove>
+              <a href="#">{{ $t('global.remove') }}</a>
             </a-popconfirm>
           </template>
-        </span>
+        </a-table-column>
+
       </a-table>
 
       <create-form
@@ -65,46 +71,12 @@ import { page, save, update, get, remove } from '@/api/rbac/config'
 
 import CreateForm from './CreateForm'
 
-const columns = [
-  {
-    title: 'ID',
-    dataIndex: 'id'
-  },
-  {
-    title: '字典编码',
-    dataIndex: 'keyCode'
-  },
-  {
-    title: '字典值',
-    dataIndex: 'keyValue'
-  },
-  {
-    title: '字典简介',
-    dataIndex: 'keyDesc'
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'createTime'
-  },
-  {
-    title: '更新时间',
-    dataIndex: 'updateTime'
-  },
-  {
-    title: '操作',
-    dataIndex: 'action',
-    width: '150px',
-    scopedSlots: { customRender: 'action' }
-  }
-]
-
 export default {
   name: 'TableList',
   components: {
     CreateForm
   },
   data () {
-    this.columns = columns
     return {
       // create model
       visible: false,
@@ -120,7 +92,7 @@ export default {
         pageSize: 10,
         showSizeChanger: true,
         total: 0,
-        showTotal: total => `总共 ${total} 条数据`
+        showTotal: total => this.$t('global.pagination.total', { total: total })
       },
       selectedRowKeys: [],
       selectedRows: [],
@@ -163,7 +135,7 @@ export default {
               // 刷新表格
               this.loadTableData()
 
-              this.$message.info('修改成功')
+              this.$message.info(this.$t('global.save.ok'))
             }).catch(e => {
               this.confirmLoading = false
             })
@@ -177,7 +149,7 @@ export default {
               // 刷新表格
               this.loadTableData()
 
-              this.$message.info('新增成功')
+              this.$message.info(this.$t('global.save.ok'))
             }).catch(e => {
               this.confirmLoading = false
             })
@@ -200,7 +172,7 @@ export default {
         this.$message.info(resp.msg)
       }).catch(e => {
         this.loadTableData()
-        this.$message.error('删除失败')
+        this.$message.error(this.$t('global.requestFailed'))
       })
     },
     onSelectChange (selectedRowKeys, selectedRows) {

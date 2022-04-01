@@ -1,0 +1,23 @@
+export default {
+    'system.user.detail': '用户详情',
+    'system.user.account': '账号',
+    'system.user.account.placeholder': '请输入账号',
+    'system.user.account.required': '账号必填',
+    'system.user.account.length': '账号长度须为5-40个字符',
+    'system.user.password': '密码',
+    'system.user.password.placeholder': '请输入密码',
+    'system.user.password.required': '密码必填',
+    'system.user.password.length': '密码长度须为6-40个字符',
+    'system.user.email': '邮箱',
+    'system.user.email.valid': '请输入有效的邮箱地址, 如: mobinchao@hotmail.com',
+    'system.user.phoneNumber': '电话号码',
+    'system.user.phoneNumber.valid': '请输入有效的电话号码, 如: 13800138000',
+    'system.user.nickname': '昵称',
+    'system.user.nickname.placeholder': '请输入昵称',
+    'system.user.nickname.required': '昵称必填',
+    'system.user.nickname.length': '昵称长度须为2-40字符',
+    'system.user.accountState': '状态',
+    'system.user.accountState.normal': '正常',
+    'system.user.accountState.locked': '锁定',
+    'system.user.accountState.invalid': '注销'
+}

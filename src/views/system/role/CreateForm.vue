@@ -1,6 +1,6 @@
 <template>
   <a-modal
-    title="角色信息"
+    :title="$t('system.role.detail')"
     :width="640"
     :visible="visible"
     :confirmLoading="loading"
@@ -10,21 +10,29 @@
     <a-spin :spinning="loading">
       <a-form :form="form" v-bind="formLayout">
         <!-- 检查是否有 id 并且大于0，大于0是修改。其他是新增，新增不显示主键ID -->
-        <a-form-item v-show="model && model.id > 0" label="主键ID">
+        <a-form-item v-show="model && model.id > 0" label="ID">
           <a-input v-decorator="['id', { initialValue: 0 }]" disabled />
         </a-form-item>
-        <a-form-item label="角色编码">
-          <a-input v-decorator="['roleCode', {rules: [{required: true, min: 4, message: '请输入角色编码'}]}]" :disabled="model && model.id > 0" />
+        <a-form-item :label="$t('system.role.roleCode')">
+          <a-input
+            v-decorator="['roleCode', {rules: [{required: true, min: 4, message: this.$t('system.role.roleCode.required')}]}]"
+            :disabled="model && model.id > 0"
+            :placeholder="$t('system.role.roleCode.placeholder')"
+          />
         </a-form-item>
-        <a-form-item label="角色名称">
-          <a-input v-decorator="['roleName', {rules: [{required: true, min: 2, message: '请输入角色名称'}]}]" />
+        <a-form-item :label="$t('system.role.roleName')">
+          <a-input
+            v-decorator="['roleName', {rules: [{required: true, min: 2, message: this.$t('system.role.roleName.required')}]}]"
+            :placeholder="$t('system.role.roleName.placeholder')"
+          />
         </a-form-item>
-        <a-form-item label="默认角色">
+        <a-form-item :label="$t('system.role.roleDefault')">
           <a-checkbox v-decorator="['roleDefault', {valuePropName: 'checked', initialValue: false}]" />
+          <span style="color: red;">&nbsp;&nbsp;&nbsp;&nbsp;{{ $t('system.role.roleDefault.alt') }}</span>
         </a-form-item>
-        <a-form-item label="角色简介">
+        <a-form-item :label="$t('system.role.roleDesc')">
           <a-textarea
-            placeholder="请输入角色简介"
+            :placeholder="$t('system.role.roleDesc.placeholder')"
             :rows="4"
             v-decorator="['roleDesc', {}]"
           />

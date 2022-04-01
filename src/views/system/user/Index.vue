@@ -5,29 +5,29 @@
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-form-item label="账号">
+              <a-form-item :label="$t('system.user.account')">
                 <a-input v-model="queryParam.account" placeholder=""/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
-              <a-form-item label="邮箱">
+              <a-form-item :label="$t('system.user.email')">
                 <a-input v-model="queryParam.email" placeholder=""/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
-              <a-form-item label="手机号">
+              <a-form-item :label="$t('system.user.phoneNumber')">
                 <a-input v-model="queryParam.phoneNumber" placeholder=""/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
-              <a-form-item label="昵称">
-                <a-input v-model="queryParam.nickName" placeholder=""/>
+              <a-form-item :label="$t('system.user.nickname')">
+                <a-input v-model="queryParam.nickname" placeholder=""/>
               </a-form-item>
             </a-col>
             <a-col :md="8 || 24" :sm="24">
               <span class="table-page-search-submitButtons">
-                <a-button type="primary" @click="loadTableData">查询</a-button>
-                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
+                <a-button type="primary" @click="loadTableData">{{ $t('global.query') }}</a-button>
+                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">{{ $t('global.reset') }}</a-button>
               </span>
             </a-col>
           </a-row>
@@ -35,43 +35,51 @@
       </div>
 
       <div class="table-operator">
-        <a-button type="primary" icon="plus" @click="handleAdd">新建</a-button>
+        <a-button type="primary" icon="plus" @click="handleAdd">{{ $t('global.add') }}</a-button>
       </div>
 
       <a-table
         ref="table"
         size="default"
         rowKey="id"
-        :columns="columns"
         :data-source="data"
         :pagination="pagination"
         :loading="loading"
         @change="tableChange"
+        bordered
       >
 
-        <span slot="accountState" slot-scope="accountState">
-          <a-tag v-if="accountState === 0" color="green">
-            正常
-          </a-tag>
-          <a-tag v-if="accountState === 1" color="orange">
-            锁定
-          </a-tag>
-          <a-tag v-if="accountState === 2" color="red">
-            注销
-          </a-tag>
-        </span>
-
-        <span slot="action" slot-scope="text, record">
-          <template>
-            <a @click="handleGranted(record)">授权</a>
+        <a-table-column key="id" title="ID" data-index="id" />
+        <a-table-column key="account" :title="$t('system.user.account')" data-index="account" />
+        <a-table-column key="nickName" :title="$t('system.user.nickname')" data-index="nickName" />
+        <a-table-column key="accountState" :title="$t('system.user.accountState')" data-index="accountState">
+          <template slot-scope="text">
+            <a-tag v-if="text === 0" color="green">
+              {{ $t('system.user.accountState.normal') }}
+            </a-tag>
+            <a-tag v-if="text === 1" color="orange">
+              {{ $t('system.user.accountState.locked') }}
+            </a-tag>
+            <a-tag v-if="text === 2" color="red">
+              {{ $t('system.user.accountState.invalid') }}
+            </a-tag>
+          </template>
+        </a-table-column>
+        <a-table-column key="email" :title="$t('system.user.email')" data-index="email" />
+        <a-table-column key="phoneNumber" :title="$t('system.user.phoneNumber')" data-index="phoneNumber" />
+        <a-table-column key="createTime" :title="$t('global.createTime')" data-index="createTime" :width="120" />
+        <a-table-column key="updateTime" :title="$t('global.updateTime')" data-index="updateTime" :width="120" />
+        <a-table-column key="action" :title="$t('global.action')">
+          <template slot-scope="text, record">
+            <a @click="handleGranted(record)">{{ $t('system.role.auth') }}</a>
             <a-divider type="vertical" />
-            <a @click="handleEdit(record)">编辑</a>
+            <a @click="handleEdit(record)">{{ $t('global.edit') }}</a>
             <a-divider type="vertical" />
-            <a-popconfirm title="确定删除？" ok-text="是" cancel-text="否" @confirm="handleRemove(record)">
-              <a href="#">删除</a>
+            <a-popconfirm :title="$t('global.areYouSure')" :ok-text="$t('global.yes')" :cancel-text="$t('global.no')" @confirm="handleRemove(record)">
+              <a href="#">{{ $t('global.remove') }}</a>
             </a-popconfirm>
           </template>
-        </span>
+        </a-table-column>
       </a-table>
 
       <create-form
@@ -83,7 +91,7 @@
 
       <a-modal
         ref="grantedDialog"
-        title="角色授权"
+        :title="$t('system.role.roleGrant')"
         :maskClosable="false"
         v-model="showAuthDialog"
         :footer="null"
@@ -104,48 +112,6 @@ import { page, get, remove } from '@/api/rbac/user'
 import CreateForm from './CreateForm'
 import RoleGrantPanel from './RoleGrantPanel.vue'
 
-const columns = [
-  {
-    title: 'ID',
-    dataIndex: 'id'
-  },
-  {
-    title: '账号',
-    dataIndex: 'account'
-  },
-  {
-    title: '昵称',
-    dataIndex: 'nickName'
-  },
-  {
-    title: '账号状态',
-    dataIndex: 'accountState',
-    scopedSlots: { customRender: 'accountState' }
-  },
-  {
-    title: '邮箱',
-    dataIndex: 'email'
-  },
-  {
-    title: '手机号',
-    dataIndex: 'phoneNumber'
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'createTime'
-  },
-  {
-    title: '更新时间',
-    dataIndex: 'updateTime'
-  },
-  {
-    title: '操作',
-    dataIndex: 'action',
-    width: '150px',
-    scopedSlots: { customRender: 'action' }
-  }
-]
-
 export default {
   name: 'TableList',
   components: {
@@ -153,7 +119,6 @@ export default {
     RoleGrantPanel
   },
   data () {
-    this.columns = columns
     return {
       // 查询参数
       queryParam: {},
@@ -163,7 +128,7 @@ export default {
         pageSize: 10,
         showSizeChanger: true,
         total: 0,
-        showTotal: total => `总共 ${total} 条数据`
+        showTotal: total => this.$t('global.pagination.total', { total: total })
       },
       selectedRowKeys: [],
       selectedRows: [],
@@ -217,7 +182,7 @@ export default {
         this.$message.info(resp.msg)
       }).catch(e => {
         this.$refs.table.refresh()
-        this.$message.error('删除失败')
+        this.$message.error(this.$t('global.requestFailed'))
       })
     },
     onSelectChange (selectedRowKeys, selectedRows) {

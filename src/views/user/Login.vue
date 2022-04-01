@@ -84,14 +84,14 @@
         </a-tab-pane>
       </a-tabs>
 
-      <a-form-item>
+      <!-- <a-form-item>
         <a-checkbox v-decorator="['rememberMe', { valuePropName: 'checked' }]">{{ $t('user.login.remember-me') }}</a-checkbox>
         <router-link
           :to="{ name: 'recover', params: { user: 'aaa'} }"
           class="forge-password"
           style="float: right;"
         >{{ $t('user.login.forgot-password') }}</router-link>
-      </a-form-item>
+      </a-form-item> -->
 
       <a-form-item style="margin-top:24px">
         <a-button
@@ -104,7 +104,7 @@
         >{{ $t('user.login.login') }}</a-button>
       </a-form-item>
 
-      <div class="user-login-other">
+      <!-- <div class="user-login-other">
         <span>{{ $t('user.login.sign-in-with') }}</span>
         <a>
           <a-icon class="item-icon" type="alipay-circle"></a-icon>
@@ -116,7 +116,7 @@
           <a-icon class="item-icon" type="weibo-circle"></a-icon>
         </a>
         <router-link class="register" :to="{ name: 'register' }">{{ $t('user.login.signup') }}</router-link>
-      </div>
+      </div> -->
     </a-form>
 
     <two-step-captcha
@@ -208,7 +208,6 @@ export default {
         if (!err) {
           const loginParams = { ...values }
           delete loginParams.username
-          console.log(loginParams)
           loginParams.loginType = this.loginType
           loginParams.account = values.username
           loginParams.accountAuth = md5(values.password)
@@ -216,7 +215,6 @@ export default {
             loginParams.imgValidCodeId = this.captchaInfo.id
             loginParams.imgValidCodeText = values.imgValidCodeText
           }
-          // console.log(loginParams)
           Login(loginParams)
             .then((res) => this.loginSuccess(res))
             .catch(() => {
@@ -291,8 +289,8 @@ export default {
       // 延迟 1 秒显示欢迎信息
       setTimeout(() => {
         this.$notification.success({
-          message: '欢迎',
-          description: `${timeFix()}，欢迎回来`
+          message: this.$t('login.submit.success.welcome'),
+          description: `${timeFix()} ${this.$t('login.submit.success.msg')}`
         })
       }, 1000)
       this.isLoginError = false
@@ -300,8 +298,8 @@ export default {
     requestFailed (err) {
       this.isLoginError = true
       this.$notification['error']({
-        message: '错误',
-        description: ((err.response || {}).data || {}).message || '请求出现错误，请稍后再试',
+        message: `${this.$t('global.error')}`,
+        description: ((err.response || {}).data || {}).message || this.$t('global.requestFailed'),
         duration: 4
       })
     },

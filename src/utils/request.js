@@ -4,6 +4,7 @@ import storage from 'store'
 import notification from 'ant-design-vue/es/notification'
 import { VueAxios } from './axios'
 import { ACCESS_TOKEN, APP_LANGUAGE } from '@/store/mutation-types'
+import { i18nRender } from '@/locales'
 
 // 创建 axios 实例
 const request = axios.create({
@@ -104,14 +105,14 @@ request.interceptors.response.use((response) => {
        */
       if (res.code === 401 || res.code === 10003 || res.code === 10004) {
         notification.error({
-          message: '错误',
-          description: '会话超时，请重新登录'
+          message: `${i18nRender('global.error')}`,
+          description: `${i18nRender('global.sessionTimeout')}`
         })
         store.dispatch('LocalLogout').then(() => {
         })
-        setTimeout(() => {
-          window.location.reload()
-        }, 1000)
+        // setTimeout(() => {
+        //   window.location.reload()
+        // }, 1000)
       }
       return Promise.reject(res)
     } else {

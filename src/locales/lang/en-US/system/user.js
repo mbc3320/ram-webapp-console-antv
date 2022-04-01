@@ -1,0 +1,23 @@
+export default {
+    'system.user.detail': 'User Detail',
+    'system.user.account': 'Account',
+    'system.user.account.placeholder': 'Please input account',
+    'system.user.account.required': 'Account is required',
+    'system.user.account.length': 'Account must be 5-40 characters',
+    'system.user.password': 'Password',
+    'system.user.password.placeholder': '6-40 characters',
+    'system.user.password.required': 'Password is required',
+    'system.user.password.length': 'Password must be 6-40 characters',
+    'system.user.email': 'Email',
+    'system.user.email.valid': 'Please input a valid email address, ex: mobinchao@hotmail.com',
+    'system.user.phoneNumber': 'Telephone',
+    'system.user.phoneNumber.valid': 'Please input a valid telephone, ex: 13800138000',
+    'system.user.nickname': 'Nickname',
+    'system.user.nickname.placeholder': 'Please input nickname',
+    'system.user.nickname.required': 'Nickname is required',
+    'system.user.nickname.length': 'Nickname must be 2-40 characters',
+    'system.user.accountState': 'State',
+    'system.user.accountState.normal': 'Normal',
+    'system.user.accountState.locked': 'Locked',
+    'system.user.accountState.invalid': 'Invalid'
+}

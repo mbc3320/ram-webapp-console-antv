@@ -5,11 +5,18 @@ import global from './en-US/global'
 import menu from './en-US/menu'
 import setting from './en-US/setting'
 import user from './en-US/user'
-
 import dashboard from './en-US/dashboard'
 import form from './en-US/form'
 import result from './en-US/result'
 import account from './en-US/account'
+import utils from './en-US/utils'
+import login from './en-US/login'
+import systemConfig from './en-US/system/config'
+import systemPermission from './en-US/system/permission'
+import systemRole from './en-US/system/role'
+import systemUser from './en-US/system/user'
+import systemTicket from './en-US/system/ticket'
+import systemSettings from './en-US/system/settings'
 
 const components = {
   antLocale: antdEnUS,
@@ -22,7 +29,7 @@ export default {
 
   'layouts.usermenu.dialog.title': 'Message',
   'layouts.usermenu.dialog.content': 'Are you sure you would like to logout?',
-  'layouts.userLayout.title': 'Ant Design is the most influential web design specification in Xihu district',
+  'layouts.userLayout.title': 'Simple, easy to use, easy to scale',
   ...components,
   ...global,
   ...menu,
@@ -31,5 +38,13 @@ export default {
   ...dashboard,
   ...form,
   ...result,
-  ...account
+  ...account,
+  ...utils,
+  ...login,
+  ...systemConfig,
+  ...systemPermission,
+  ...systemRole,
+  ...systemUser,
+  ...systemTicket,
+  ...systemSettings
 }

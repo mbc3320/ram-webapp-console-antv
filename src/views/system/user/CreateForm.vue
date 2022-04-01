@@ -1,6 +1,6 @@
 <template>
   <a-modal
-    title="用户信息"
+    :title="$t('system.user.detail')"
     :width="640"
     :visible="visible"
     :confirmLoading="loading"
@@ -16,34 +16,34 @@
         :wrapper-col="wrapperCol"
       >
         <!-- 检查是否有 id 并且大于0，大于0是修改。其他是新增，新增不显示主键ID -->
-        <a-form-model-item v-if="form && form.id !== null" label="主键ID" prop="id">
+        <a-form-model-item v-if="form && form.id !== null" label="ID" prop="id">
           <a-input v-model="form.id" disabled />
         </a-form-model-item>
-        <a-form-model-item label="账号" prop="account">
-          <a-input v-model="form.account" :disabled="form && form.id !=null" placeholder="请输入账号" />
+        <a-form-model-item :label="$t('system.user.account')" prop="account">
+          <a-input v-model="form.account" :disabled="form && form.id !=null" :placeholder="$t('system.user.account.placeholder')" />
         </a-form-model-item>
-        <a-form-model-item label="昵称" prop="nickName">
-          <a-input v-model="form.nickName" placeholder="请输入昵称" />
+        <a-form-model-item :label="$t('system.user.nickName')" prop="nickName">
+          <a-input v-model="form.nickName" :placeholder="$t('system.user.nickName.placeholder')" />
         </a-form-model-item>
-        <a-form-model-item label="密码" prop="password" v-if="form && form.id == null">
-          <a-input type="password" v-model="form.password" placeholder="请输入密码" />
+        <a-form-model-item :label="$t('system.user.password')" prop="password" v-if="form && form.id == null">
+          <a-input type="password" v-model="form.password" :placeholder="$t('system.user.password.placeholder')" />
         </a-form-model-item>
-        <a-form-model-item label="邮箱" prop="email">
-          <a-input type="email" v-model="form.email" placeholder="请输入邮箱" />
+        <a-form-model-item :label="$t('system.user.email')" prop="email">
+          <a-input type="email" v-model="form.email" placeholder="ex:mobinchao@hotmail.com" />
         </a-form-model-item>
-        <a-form-model-item label="手机号码" prop="phoneNumber">
-          <a-input type="phone" v-model="form.phoneNumber" placeholder="请输入手机号" />
+        <a-form-model-item :label="$t('system.user.phoneNumber')" prop="phoneNumber">
+          <a-input type="phone" v-model="form.phoneNumber" placeholder="ex: 13800138000" />
         </a-form-model-item>
-        <a-form-model-item label="账号状态" prop="accountState">
+        <a-form-model-item :label="$t('system.user.accountState')" prop="accountState">
           <a-radio-group v-model="form.accountState">
             <a-radio-button :value="0">
-              正常
+              {{ $t('system.user.accountState.normal') }}
             </a-radio-button>
             <a-radio-button :value="1">
-              锁定
+              {{ $t('system.user.accountState.locked') }}
             </a-radio-button>
             <a-radio-button :value="2">
-              注销
+              {{ $t('system.user.accountState.invalid') }}
             </a-radio-button>
           </a-radio-group>
         </a-form-model-item>
@@ -66,18 +66,18 @@ export default {
       loading: false,
       rules: {
         account: [
-          { required: true, message: '请输入账号', trigger: 'blur' },
-          { min: 5, max: 40, message: '长度介于5~40之间', trigger: 'blur' }
+          { required: true, message: this.$t('system.user.account.required'), trigger: 'blur' },
+          { min: 5, max: 40, message: this.$t('system.user.account.length'), trigger: 'blur' }
         ],
-        password: [{ required: true, message: '请输入密码', trigger: 'change' },
-          { min: 5, max: 40, pattern: '^\\w{6,36}$', message: '长度介于5~40之间, 或不满足复杂度要求', trigger: 'blur' }
+        password: [{ required: true, message: this.$t('system.user.password.required'), trigger: 'change' },
+          { min: 5, max: 40, pattern: '^\\w{6,36}$', message: this.$t('system.user.password.length'), trigger: 'blur' }
         ],
-        email: [{ required: false, type: 'email', message: '请输入邮箱', trigger: 'change' }],
+        email: [{ required: false, type: 'email', message: this.$t('system.user.email.valid'), trigger: 'change' }],
         phoneNumber: [
-          { required: false, message: '请输入电话号码', trigger: 'change' }
+          { required: false, message: this.$t('system.user.phoneNumber.valid'), trigger: 'change' }
         ],
-        nickName: [{ required: true, message: '请输入昵称', trigger: 'blur' },
-        { min: 2, max: 40, message: '长度介于2~40之间', trigger: 'blur' }]
+        nickName: [{ required: true, message: this.$t('system.user.nickName.required'), trigger: 'blur' },
+        { min: 2, max: 40, message: this.$t('system.user.nickName.length'), trigger: 'blur' }]
       },
       form: {
         id: null,
@@ -105,7 +105,7 @@ export default {
               this.loading = false
               // 重置表单数据
               ruleFormRef.resetFields()
-              this.$message.info('修改成功')
+              this.$message.info(this.$t('global.save.ok'))
               this.$emit('listenToChildEvent')
             }).catch(e => {
               this.loading = false
@@ -117,7 +117,7 @@ export default {
               this.loading = false
               // 重置表单数据
               ruleFormRef.resetFields()
-              this.$message.info('新增成功')
+              this.$message.info(this.$t('global.save.ok'))
               this.$emit('listenToChildEvent')
             }).catch(e => {
               this.loading = false

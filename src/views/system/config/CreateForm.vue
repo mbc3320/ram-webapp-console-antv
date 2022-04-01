@@ -1,6 +1,6 @@
 <template>
   <a-modal
-    title="字典信息"
+    :title="$t('system.config.keyInfo')"
     :width="640"
     :visible="visible"
     :confirmLoading="loading"
@@ -10,18 +10,26 @@
     <a-spin :spinning="loading">
       <a-form :form="form" v-bind="formLayout">
         <!-- 检查是否有 id 并且大于0，大于0是修改。其他是新增，新增不显示主键ID -->
-        <a-form-item v-show="model && model.id > 0" label="主键ID">
+        <a-form-item v-show="model && model.id > 0" label="ID">
           <a-input v-decorator="['id', { initialValue: 0 }]" disabled />
         </a-form-item>
-        <a-form-item label="字典编码">
-          <a-input v-decorator="['keyCode', {rules: [{required: true, min: 4, message: '请输入字典编码'}]}]" :disabled="model && model.id > 0" />
+        <a-form-item :label="$t('system.config.keyCode')">
+          <a-input
+            v-decorator="['keyCode', {rules: [{required: true, min: 4, message: () => this.$t('system.config.keyCodeInputPlaceholder')}]}]"
+            :disabled="model && model.id > 0"
+            :placeholder="$t('system.config.keyCodeInputPlaceholder')"
+          />
         </a-form-item>
-        <a-form-item label="字典值">
-          <a-textarea :rows="4" v-decorator="['keyValue', {rules: [{required: true, min: 2, message: '请输入字典值'}]}]" />
-        </a-form-item>
-        <a-form-item label="字典简介">
+        <a-form-item :label="$t('system.config.keyValue')">
           <a-textarea
-            placeholder="请输入字典简介"
+            :rows="4"
+            v-decorator="['keyValue', {rules: [{required: true, min: 2, message: ()=> this.$t('system.config.keyValueInputPlaceholder')}]}]"
+            :placeholder="$t('system.config.keyValueInputPlaceholder')"
+          />
+        </a-form-item>
+        <a-form-item :label="$t('system.config.keyDesc')">
+          <a-textarea
+            :placeholder="$t('system.config.keyDescInputPlaceholder')"
             :rows="4"
             v-decorator="['keyDesc', {}]"
           />
@@ -75,6 +83,8 @@ export default {
     this.$watch('model', () => {
       this.model && this.form.setFieldsValue(pick(this.model, fields))
     })
+  },
+  methods: {
   }
 }
 </script>

@@ -9,8 +9,7 @@
         <div class="top">
           <div class="header">
             <a href="/">
-              <img src="~@/assets/logo.svg" class="logo" alt="logo">
-              <span class="title">Ant Design</span>
+              <span class="title">RAM Framework</span>
             </a>
           </div>
           <div class="desc">
@@ -22,12 +21,10 @@
 
         <div class="footer">
           <div class="links">
-            <a href="_self">帮助</a>
-            <a href="_self">隐私</a>
-            <a href="_self">条款</a>
+            <a href="https://ram-framework.tech/">{{ $t('global.document') }}</a>
           </div>
           <div class="copyright">
-            Copyright &copy; 2018 vueComponent
+            Copyright &copy; 2021 <a href="https://ram-framework.tech">https://ram-framework.tech</a>
           </div>
         </div>
       </div>

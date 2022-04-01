@@ -5,19 +5,19 @@
         <a-form layout="inline">
           <a-row :gutter="48">
             <a-col :md="8" :sm="24">
-              <a-form-item label="角色编码">
+              <a-form-item :label="$t('system.role.roleCode')">
                 <a-input v-model="queryParam.roleCode" placeholder=""/>
               </a-form-item>
             </a-col>
             <a-col :md="8" :sm="24">
-              <a-form-item label="角色名称">
+              <a-form-item :label="$t('system.role.roleName')">
                 <a-input v-model="queryParam.roleName" placeholder=""/>
               </a-form-item>
             </a-col>
             <a-col :md="8 || 24" :sm="24">
               <span class="table-page-search-submitButtons">
-                <a-button type="primary" @click="loadTableData">查询</a-button>
-                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">重置</a-button>
+                <a-button type="primary" @click="loadTableData">{{ $t('global.query') }}</a-button>
+                <a-button style="margin-left: 8px" @click="() => this.queryParam = {}">{{ $t('global.reset') }}</a-button>
               </span>
             </a-col>
           </a-row>
@@ -25,35 +25,41 @@
       </div>
 
       <div class="table-operator">
-        <a-button type="primary" icon="plus" @click="handleAdd">新建</a-button>
+        <a-button type="primary" icon="plus" @click="handleAdd">{{ $t('global.add') }}</a-button>
       </div>
 
       <a-table
         ref="table"
         size="default"
         rowKey="id"
-        :columns="columns"
         :data-source="data"
         :pagination="pagination"
         :loading="loading"
         @change="tableChange"
       >
 
-        <span slot="roleDefault" slot-scope="text">
-          <a-badge :status="text ? 'success' : 'warning'" :text="text ? '是' : '否'" />
-        </span>
-
-        <span slot="action" slot-scope="text, record">
-          <template>
-            <a @click="handleGrant(record)">授权</a>
+        <a-table-column key="id" title="ID" data-index="id" />
+        <a-table-column key="roleCode" :title="$t('system.role.roleCode')" data-index="roleCode" />
+        <a-table-column key="roleName" :title="$t('system.role.roleName')" data-index="roleName" />
+        <a-table-column key="roleDefault" :title="$t('system.role.roleDefault')" data-index="roleDefault">
+          <template slot-scope="text">
+            <a-badge :status="text ? 'success' : 'warning'" :text="text ? this.$t('global.yes') : this.$t('global.no')" />
+          </template>
+        </a-table-column>
+        <a-table-column key="roleDesc" :title="$t('system.role.roleDesc')" data-index="roleDesc" />
+        <a-table-column key="createTime" :title="$t('global.createTime')" data-index="createTime" />
+        <a-table-column key="updateTime" :title="$t('global.updateTime')" data-index="updateTime" />
+        <a-table-column key="action" :title="$t('global.action')">
+          <template slot-scope="text, record">
+            <a @click="handleGrant(record)">{{ $t('system.role.auth') }}</a>
             <a-divider type="vertical" />
-            <a @click="handleEdit(record)">编辑</a>
+            <a @click="handleEdit(record)">{{ $t('global.edit') }}</a>
             <a-divider type="vertical" />
-            <a-popconfirm title="确定删除？" ok-text="是" cancel-text="否" @confirm="handleRemove(record)">
-              <a href="#">删除</a>
+            <a-popconfirm :title="$t('global.areYouSure')" :ok-text="$t('global.yes')" :cancel-text="$t('global.no')" @confirm="handleRemove(record)">
+              <a href="#">{{ $t('global.remove') }}</a>
             </a-popconfirm>
           </template>
-        </span>
+        </a-table-column>
       </a-table>
 
       <create-form
@@ -67,16 +73,16 @@
 
       <a-modal
         ref="grantedDialog"
-        title="角色授权"
+        :title="$t('system.role.roleGrant')"
         :maskClosable="false"
         v-model="showAuthDialog"
       >
         <template slot="footer">
           <a-button key="back" @click="onAuthDialogClose">
-            关闭
+            {{ $t('global.close') }}
           </a-button>
           <a-button key="submit" type="danger" :loading="grantedDialogLoading" @click="doGranted">
-            授权
+            {{ $t('system.role.auth') }}
           </a-button>
         </template>
 
@@ -84,13 +90,13 @@
           <!-- <a-tab-pane key="0" tab="用户授权">
             <p>用户授权</p>
           </a-tab-pane> -->
-          <a-tab-pane key="1" tab="接口授权">
+          <a-tab-pane key="1" :tab="$t('system.role.apiGrant')">
             <PermissionGrant ref="apiGrantRef" :roleId="currentRecordId" :type="0" @listenToChildEvent="grantedDone" />
           </a-tab-pane>
-          <a-tab-pane key="2" tab="菜单授权">
+          <a-tab-pane key="2" :tab="$t('system.role.menuGrant')">
             <PermissionGrant ref="menuGrantRef" :roleId="currentRecordId" :type="1" @listenToChildEvent="grantedDone" />
           </a-tab-pane>
-          <a-tab-pane key="3" tab="功能授权">
+          <a-tab-pane key="3" :tab="$t('system.role.functionGrant')">
             <PermissionGrant ref="funGrantRef" :roleId="currentRecordId" :type="2" @listenToChildEvent="grantedDone" />
           </a-tab-pane>
         </a-tabs>
@@ -107,44 +113,6 @@ import PermissionGrant from '@/components/rbac/PermissionGrant.vue'
 
 import CreateForm from './CreateForm'
 
-const columns = [
-  {
-    title: 'ID',
-    dataIndex: 'id'
-  },
-  {
-    title: '角色编码',
-    dataIndex: 'roleCode'
-  },
-  {
-    title: '角色名称',
-    dataIndex: 'roleName'
-  },
-  {
-    title: '默认角色',
-    dataIndex: 'roleDefault',
-    scopedSlots: { customRender: 'roleDefault' }
-  },
-  {
-    title: '角色简介',
-    dataIndex: 'roleDesc'
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'createTime'
-  },
-  {
-    title: '更新时间',
-    dataIndex: 'updateTime'
-  },
-  {
-    title: '操作',
-    dataIndex: 'action',
-    width: '150px',
-    scopedSlots: { customRender: 'action' }
-  }
-]
-
 export default {
   name: 'TableList',
   components: {
@@ -152,7 +120,6 @@ export default {
     PermissionGrant
   },
   data () {
-    this.columns = columns
     return {
       // create model
       visible: false,
@@ -166,7 +133,7 @@ export default {
         pageSize: 10,
         showSizeChanger: true,
         total: 0,
-        showTotal: total => `总共 ${total} 条数据`
+        showTotal: total => this.$t('global.pagination.total', { total: total })
       },
       selectedRowKeys: [],
       selectedRows: [],
@@ -213,7 +180,7 @@ export default {
               // 刷新表格
               this.loadTableData()
 
-              this.$message.info('修改成功')
+              this.$message.info(this.$t('global.save.ok'))
             }).catch(e => {
               this.confirmLoading = false
             })
@@ -227,7 +194,7 @@ export default {
               // 刷新表格
               this.loadTableData()
 
-              this.$message.info('新增成功')
+              this.$message.info(this.$t('global.save.ok'))
             }).catch(e => {
               this.confirmLoading = false
             })
@@ -250,7 +217,7 @@ export default {
         this.$message.info(resp.msg)
       }).catch(e => {
         this.$refs.table.refresh()
-        this.$message.error('删除失败')
+        this.$message.error(this.$t('global.requestFailed'))
       })
     },
     onSelectChange (selectedRowKeys, selectedRows) {
@@ -268,8 +235,8 @@ export default {
     },
     doGranted () {
       this.$confirm({
-        title: '确定变更授权信息?',
-        content: '一旦确定，将即时更新系统所有涉及授权的用户的权限信息',
+        title: this.$t('system.role.doGrant.title'),
+        content: this.$t('system.role.doGrant.content'),
         onOk: () => {
           this.grantedDialogLoading = true
           switch (this.grantDialogTabKey) {
